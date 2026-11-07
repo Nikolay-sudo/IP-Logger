@@ -1,0 +1,21 @@
+{% extends "base.html" %} {% block title %}Visit dashboard · Linklog{% endblock %} {% block content %}
+PRIVATE DASHBOARD
+Visit activity
+For {{ link.destination_url }}
+
+{{ visits|length }}{{ 'visit' if visits|length == 1 else 'visits' }}
+Recent visits
+Newest activity appears first.
+
+🔒 Private
+{% if visits %}
+{% for visit in visits %}{% endfor %}
+VISITOR IP	USER AGENT	VISITED AT (UTC)
+{{ visit.ip_address }}	{{ visit.user_agent or 'Not provided' }}	{{ visit.visited_at.strftime('%Y-%m-%d %H:%M:%S') }} UTC
+{% else %}
+◷
+No visits yet
+When someone opens your tracking link, their visit will show up here.
+
+{% endif %}
+← Create another link {% endblock %}
