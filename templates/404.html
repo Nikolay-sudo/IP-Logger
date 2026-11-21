@@ -1,7 +1,10 @@
-{% extends "base.html" %}{% block title %}Not found · Linklog{% endblock %}{% block content %}
-404
-Link not found
-This link may be invalid or no longer available.
-
-Go to Linklog
+{% extends "base.html" %}
+{% block title %}Not found · Linklog{% endblock %}
+{% block content %}
+<div class="card error-card">
+    <div class="error-code">404 ERROR</div>
+    <h1>Link not found</h1>
+    <p class="lede compact">This link may be invalid or no longer available.</p>
+    <a href="{{ url_for('index') }}" class="button-link">Go to Linklog</a>
+</div>
 {% endblock %}
