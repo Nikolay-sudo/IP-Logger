@@ -1,21 +1,62 @@
-{% extends "base.html" %} {% block title %}Visit dashboard · Linklog{% endblock %} {% block content %}
-PRIVATE DASHBOARD
-Visit activity
-For {{ link.destination_url }}
+{% extends "base.html" %}
+{% block title %}Visit dashboard · Linklog{% endblock %}
+{% block content %}
+<div class="dashboard-head">
+    <div>
+        <div class="eyebrow">PRIVATE DASHBOARD</div>
+        <h1>Visit activity</h1>
+        <p class="lede">For <span class="destination-link">{{ link.destination_url }}</span></p>
+    </div>
+    <div class="visit-count">
+        <strong>{{ visits|length }}</strong>
+        <span>{{ 'visit' if visits|length == 1 else 'visits' }} total</span>
+    </div>
+</div>
 
-{{ visits|length }}{{ 'visit' if visits|length == 1 else 'visits' }}
-Recent visits
-Newest activity appears first.
+<div class="card table-card">
+    <div class="table-heading">
+        <div>
+            <h2>Recent visits</h2>
+            <p>Newest activity appears first.</p>
+        </div>
+        <div class="private-chip">🔒 Private log</div>
+    </div>
 
-🔒 Private
-{% if visits %}
-{% for visit in visits %}{% endfor %}
-VISITOR IP	USER AGENT	VISITED AT (UTC)
-{{ visit.ip_address }}	{{ visit.user_agent or 'Not provided' }}	{{ visit.visited_at.strftime('%Y-%m-%d %H:%M:%S') }} UTC
-{% else %}
-◷
-No visits yet
-When someone opens your tracking link, their visit will show up here.
+    {% if visits %}
+    <div class="table-wrap">
+        <table>
+            <thead>
+                <tr>
+                    <th>VISITOR IP</th>
+                    <th>LOCATION</th>
+                    <th>ISP / PROV</th>
+                    <th>USER AGENT</th>
+                    <th>VISITED AT (UTC)</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for visit in visits %}
+                <tr>
+                    <td class="ip-cell">{{ visit.ip_address }}</td>
+                    <td>{{ visit.city }}, {{ visit.country }}</td>
+                    <td>{{ visit.isp }}</td>
+                    <td class="ua-cell" title="{{ visit.user_agent }}">{{ visit.user_agent or 'Not provided' }}</td>
+                    <td class="time-cell">{{ visit.visited_at.strftime('%Y-%m-%d %H:%M:%S') }} UTC</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% else %}
+    <div class="empty-state">
+        <div class="empty-icon">◷</div>
+        <h3>No visits yet</h3>
+        <p>When someone opens your tracking link, their visit will show up here.</p>
+    </div>
+    {% endif %}
+</div>
 
-{% endif %}
-← Create another link {% endblock %}
+<div class="back-link">
+    <a href="{{ url_for('index') }}" class="text-link">&larr; Create another link</a>
+</div>
+{% endblock %}

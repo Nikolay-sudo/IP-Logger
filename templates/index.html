@@ -1,19 +1,46 @@
-{% extends "base.html" %} {% block title %}Create a tracked link · Linklog{% endblock %} {% block content %}
-PRIVATE LINK ANALYTICS
-Know when your
-links get clicked.
-Create a trackable link in seconds. See visit timestamps, IP addresses, and browser details in a private dashboard.
+{% extends "base.html" %}
+{% block title %}Create a tracked link · Linklog{% endblock %}
+{% block content %}
+<div class="hero">
+    <div class="eyebrow"><span class="live-dot"></span> PRIVATE LINK ANALYTICS</div>
+    <h1>Know when your <span>links get clicked.</span></h1>
+    <p class="lede">Create a trackable link in seconds. See visit timestamps, IP addresses, and browser details in a private dashboard.</p>
 
-Destination URL
-{{ destination|default('') }}
-Create link →
-Use a complete URL beginning with https:// or http://
+    <form method="POST" action="{{ url_for('create_link') }}" class="create-form">
+        <label for="destination">Destination URL</label>
+        <div class="input-row">
+            <input type="url" id="destination" name="destination" placeholder="https://example.com" value="{{ destination|default('') }}" required>
+            <button type="submit">Create link &rarr;</button>
+        </div>
+        <div class="field-help">Use a complete URL beginning with https:// or http://</div>
+    </form>
 
-◈
-A note on visitor privacy
-Visits are logged with IP address, browser details, and time. Only share tracked links where you have a valid reason and disclose this collection to visitors.
+    <div class="privacy-note">
+        <div class="shield">🛡</div>
+        <div>
+            <strong>A note on visitor privacy</strong>
+            <p>Visits are logged with IP address, browser details, and time. Only share tracked links where you have a valid reason and disclose this collection to visitors.</p>
+        </div>
+    </div>
+</div>
 
-01CreatePaste your destination
-02ShareUse your tracking link
-03ReviewCheck your private dashboard
+<div class="steps">
+    <div>
+        <span>01</span>
+        <strong>Create</strong>
+        <small>Paste your destination</small>
+    </div>
+    <i></i>
+    <div>
+        <span>02</span>
+        <strong>Share</strong>
+        <small>Use your tracking link</small>
+    </div>
+    <i></i>
+    <div>
+        <span>03</span>
+        <strong>Review</strong>
+        <small>Check your private dashboard</small>
+    </div>
+</div>
 {% endblock %}

@@ -1,5 +1,29 @@
-↗ linklogSimple click analytics
-{% with messages = get_flashed_messages(with_categories=true) %} {% for category, message in messages %}
-{{ message }}
-{% endfor %} {% endwith %} {% block content %}{% endblock %}
-Linklog · Be transparent about the data you collect.
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>{% block title %}Linklog{% endblock %}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <header class="topbar">
+        <a href="{{ url_for('index') }}" class="brand"><span class="brand-mark">↗</span>linklog</a>
+        <div class="top-note">Simple click analytics</div>
+    </header>
+
+    <main class="page">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% for category, message in messages %}
+                <div class="alert {{ category }}">{{ message }}</div>
+            {% endfor %}
+        {% endwith %}
+
+        {% block content %}{% endblock %}
+    </main>
+
+    <footer>
+        <span>Linklog</span> · <span>Be transparent about the data you collect.</span>
+    </footer>
+</body>
+</html>

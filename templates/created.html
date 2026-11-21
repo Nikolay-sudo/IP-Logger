@@ -1,11 +1,28 @@
-{% extends "base.html" %} {% block title %}Your link is ready · Linklog{% endblock %} {% block content %}
-✓
-LINK CREATED
-Your link is ready.
-Share the tracking link. Keep your private dashboard URL somewhere safe.
+{% extends "base.html" %}
+{% block title %}Your link is ready · Linklog{% endblock %}
+{% block content %}
+<div class="card result-card">
+    <div class="success-icon">✓</div>
+    <h1>Link created successfully</h1>
+    <p class="lede compact">Your tracking link is ready. Share the public link and keep your private dashboard URL safe.</p>
 
-PUBLIC TRACKING LINK{{ url_for('track', tracking_code=link.tracking_code) }}
-PRIVATE RESULTS DASHBOARD{{ url_for('results', access_key=link.access_key) }}Anyone with this URL can view the visit log.
-Redirect destination{{ link.destination_url }}
-← Create another link
+    <div class="url-block">
+        <label>Public tracking link (share this)</label>
+        <a href="{{ url_for('track', tracking_code=link.tracking_code, _external=True) }}">{{ url_for('track', tracking_code=link.tracking_code, _external=True) }}</a>
+        <small>Anyone who clicks this will be redirected after their visit is logged.</small>
+    </div>
+
+    <div class="url-block private">
+        <label>Private results dashboard (keep secret)</label>
+        <a href="{{ url_for('results', access_key=link.access_key, _external=True) }}">{{ url_for('results', access_key=link.access_key, _external=True) }}</a>
+        <small>Anyone with this URL can view the visit log. Do not share it publicly.</small>
+    </div>
+
+    <div class="destination-summary">
+        <span>Redirect destination</span>
+        <strong>{{ link.destination_url }}</strong>
+    </div>
+
+    <a href="{{ url_for('index') }}" class="text-link">&larr; Create another link</a>
+</div>
 {% endblock %}
