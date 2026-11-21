@@ -1,0 +1,11 @@
+{% extends "base.html" %} {% block title %}Your link is ready · Linklog{% endblock %} {% block content %}
+✓
+LINK CREATED
+Your link is ready.
+Share the tracking link. Keep your private dashboard URL somewhere safe.
+
+PUBLIC TRACKING LINK{{ url_for('track', tracking_code=link.tracking_code) }}
+PRIVATE RESULTS DASHBOARD{{ url_for('results', access_key=link.access_key) }}Anyone with this URL can view the visit log.
+Redirect destination{{ link.destination_url }}
+← Create another link
+{% endblock %}
